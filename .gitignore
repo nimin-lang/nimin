@@ -2,3 +2,7 @@
 bin/
 nimcache/
 tests/*_r
+bench/bench
+bench/programs/*/out_*
+tests/test_config
+tests/test_driver_assembly
