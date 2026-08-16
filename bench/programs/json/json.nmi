@@ -1,0 +1,3 @@
+import std/json
+let j = parseJson("""{"a":1,"b":[true,null]}""")
+echo j["a"].getInt

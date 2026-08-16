@@ -1,1 +1,4 @@
 .development/
+bin/
+nimcache/
+tests/*_r
