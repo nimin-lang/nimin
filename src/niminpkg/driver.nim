@@ -1,14 +1,16 @@
-import std/[os, parseopt, sequtils]
-
+import std/[os, parseopt, sequtils, strutils]
+import std/pathnorm
 import compiler/commands
 import compiler/options
 import compiler/msgs
+import compiler/lineinfos
 import compiler/main
 import compiler/idents
 import compiler/cmdlinehelper
 import compiler/modulegraphs
 import compiler/condsyms
 import compiler/pathutils
+import compiler/platform
 
 import ./config
 
@@ -20,6 +22,22 @@ proc libPath(): string =
   ## getCurrentCompilerExe() is baked at build time and points at the real
   ## nim binary (unlike findExe which can hit asdf shims).
   NimRoot / "lib"
+
+proc panicOverridePath(): string =
+  ## Path to the bundled panicoverride module.
+  currentSourcePath().parentDir / "panicoverride.nim"
+
+proc provisionPanicOverride(conf: ConfigRef) =
+  ## `--os:standalone` makes system.nim `include "$projectpath/panicoverride"`,
+  ## which must physically exist in the project dir. Copy the bundled module
+  ## there when missing so the dialect works without user boilerplate.
+  let target = conf.projectPath / RelativeFile("panicoverride.nim")
+  if not fileExists(target):
+    try:
+      copyFile(panicOverridePath(), target.string)
+      rawMessage(conf, hintUser, "nimin: provisioned $1 with bundled panicoverride" % $target)
+    except CatchableError:
+      rawMessage(conf, warnUser, "nimin: could not provision panicoverride at $1" % $target)
 
 proc processCmdLine(pass: TCmdLinePass, cmd: string; conf: ConfigRef) =
   ## Parse the full nimin command line. `cmd` is empty (the compiler driver
@@ -61,6 +79,9 @@ proc run*(): int =
   if conf.selectedGC == gcUnselected and
       conf.backend in {backendC, backendCpp, backendObjc}:
     initOrcDefines(conf)
+
+  if conf.target.targetOS == osStandalone:
+    provisionPanicOverride(conf)
 
   mainCommand(graph)
   result = conf.errorCounter
