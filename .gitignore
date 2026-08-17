@@ -7,3 +7,10 @@ bench/programs/*/out_*
 tests/test_config
 tests/test_driver_assembly
 tests/test_panicoverride
+tests/test_linter
+tests/test_span
+tests/test_io
+tests/test_cli
+tests/linter_test_cases.nim
+lib/nimin/htmldocs/
+ast_dump.nim
