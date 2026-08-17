@@ -4,7 +4,11 @@ import niminpkg/driver
 
 const
   Version = "0.1.0"
+  YearStarted = 2026
+  BuildYear {.intdefine.} = 2026
   Tagline = "Zero-baggage Nim dialect for tiny binaries on constrained runtimes."
+  Copyright = "(c) " & $YearStarted & "-" & $BuildYear &
+    " the nimin project authors and contributors. Distributed under the MIT license."
   Usage = """
 nimin — the symmetrical, zero-baggage dialect of Nim for tiny binaries and
 constrained runtimes.
@@ -34,6 +38,7 @@ proc main(): int =
   of "--version", "-v":
     stdout.writeLine "nimin " & Version
     stdout.writeLine Tagline
+    stdout.writeLine Copyright
     return 0
   of "--help", "-h", "help":
     stdout.write Usage

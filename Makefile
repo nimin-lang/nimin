@@ -1,9 +1,11 @@
 .PHONY: all build test bench install clean
 
+YEAR := $(shell date +%Y)
+
 all: build
 
 build:
-	nimble build -y
+	nimble build -y --define:BuildYear=$(YEAR)
 
 test:
 	nimble test -y
