@@ -7,6 +7,7 @@ license       = "MIT"
 
 srcDir        = "src"
 bin           = @["nimin"]
+binDir        = "bin"
 installDirs   = @["lib"]
 
 # Building nimin itself requires the Nim compiler modules and defines.
