@@ -1,5 +1,25 @@
 import std/[os, parseopt, strutils]
 
+## nimin compiler driver — drives the Nim compiler as a library.
+##
+## This module is the heart of nimin. It imports the Nim compiler's
+## own modules (`compiler/commands`, `compiler/main`, etc.) to drive
+## the full compilation pipeline, but injects nimin's strict defaults
+## before handing off to the standard code generator.
+##
+## **Pipeline overview:**
+##
+## 1. Build the command line: nimin defaults + user argv
+## 2. Initialize the compiler config (`ConfigRef`)
+## 3. Parse the command line through the compiler's own parser
+## 4. Set up the module graph with the linter hook
+## 5. Run the type-section linter (before semantic analysis)
+## 6. Run the main compilation (`mainCommand`)
+##
+## The linter (`strongSemCheck`) fires during semantic analysis for
+## routine bodies. Type-section linting is done separately because
+## `strongSemCheck` does not fire for `nkTypeSection` nodes.
+
 import compiler/commands
 import compiler/options
 import compiler/msgs

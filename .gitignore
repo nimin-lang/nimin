@@ -1,5 +1,6 @@
 .development/
 bin/
+docs/
 nimcache/
 nimin
 tests/*_r

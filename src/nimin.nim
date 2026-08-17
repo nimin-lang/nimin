@@ -1,14 +1,39 @@
+## nimin — the CLI driver for the nimin dialect of Nim.
+##
+## This is the main entry point for the `nimin` command. It handles
+## top-level flags (`--version`, `--help`, `--verbose`), then delegates
+## to the compiler driver (`niminpkg/driver`) which drives the Nim
+## compiler as a library with strict zero-baggage defaults.
+##
+## nimin mirrors the `nim c` interface: `nimin c [options] <file>` compiles
+## a file with aggressive size optimizations, panic-only error handling,
+## and the dialect linter enabled.
+
 import std/[os, strutils]
 
 import niminpkg/driver
 
 const
   Version = "0.1.0"
+    ## The current nimin version. Updated with each release.
+
   YearStarted = 2026
+    ## The year the nimin project was created.
+
   BuildYear {.intdefine.} = 2026
+    ## The year this binary was built. Overridden at compile time
+    ## via `-d:BuildYear=YYYY` (the Makefile does this automatically).
+
   Tagline = "Zero-baggage Nim dialect for tiny binaries on constrained runtimes."
+    ## The project tagline, shown in `--version` output.
 
 func copyright(): string =
+  ## Build the copyright line for `--version` output.
+  ##
+  ## Uses a single year when building in the same year as `YearStarted`,
+  ## otherwise shows a range (e.g. "2026-2028"). Detects UTF-8 locale
+  ## support and uses the proper `©` glyph when available, falling
+  ## back to `(c)` otherwise.
   let year = if YearStarted == BuildYear: $YearStarted
              else: $YearStarted & "-" & $BuildYear
   var utf8 = false
@@ -44,9 +69,15 @@ For full options, run: nimin c --fullhelp
 """
 
 proc isNiminSource(path: string): bool =
+  ## True if the file path has the `.nmi` extension (nimin dialect file).
   path.endsWith(".nmi")
 
 proc main(): int =
+  ## Main entry point for the nimin CLI.
+  ##
+  ## Handles top-level flags (`--version`, `--help`, `--verbose`), then
+  ## delegates to the compiler driver. Returns 0 on success, nonzero on
+  ## compilation error.
   let args = os.commandLineParams()
   if args.len == 0:
     stdout.write Usage
