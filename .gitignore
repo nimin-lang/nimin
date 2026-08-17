@@ -1,6 +1,7 @@
 .development/
 bin/
 nimcache/
+nimin
 tests/*_r
 bench/bench
 bench/programs/*/out_*
