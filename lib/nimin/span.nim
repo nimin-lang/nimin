@@ -11,7 +11,7 @@
 import std/posix
 
 type
-  Span[T] = object
+  Span*[T] = object
     ## A non-owning view into a contiguous region of `T` values.
     data: pointer
     len: int
@@ -20,14 +20,14 @@ type
 # Internal helpers
 # ---------------------------------------------------------------------------
 
-proc dataPtr[T](s: Span[T]): ptr UncheckedArray[T] {.inline.} =
+proc dataPtr*[T](s: Span[T]): ptr UncheckedArray[T] {.inline.} =
   cast[ptr UncheckedArray[T]](s.data)
 
 # ---------------------------------------------------------------------------
 # Construction
 # ---------------------------------------------------------------------------
 
-proc initSpan*[T](p: pointer, length: int): Span[T] =
+proc initSpan*[T](p: ptr T, length: int): Span[T] =
   ## Create a span from a raw pointer and length.
   result.data = p
   result.len = length
