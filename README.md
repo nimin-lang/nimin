@@ -155,6 +155,8 @@ nimin believes in:
 
 See the project repository for architecture decisions, development guidelines, and implementation details.
 
----
+## License
 
-Built with care for constrained runtimes. If nimin saves you bytes, that's the whole point.
+MIT License - Copyright (c) 2026 Antonio Ognio
+
+Made with ❤️ from 🇵🇪. El Perú es clave 🔑.
