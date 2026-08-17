@@ -59,7 +59,7 @@ proc processCmdLine(pass: TCmdLinePass, cmd: string; conf: ConfigRef) =
     of cmdArgument:
       if processArgument(pass, p, argsCount, conf): break
 
-proc run*(): int =
+proc run*(verbose: bool = false): int =
   ## Drive the Nim compilation pipeline with nimin's strict defaults.
   ## Returns the compiler error counter (0 = success).
   resetLintState()
@@ -72,7 +72,16 @@ proc run*(): int =
   self.initDefinesProg(conf, "nimin")
   conf.libpath = AbsoluteDir libPath()
 
+  if verbose:
+    rawMessage(conf, hintUser, "nimin: libpath = $1" % $conf.libpath)
+
   self.processCmdLineAndProjectPath(conf)
+
+  if verbose:
+    rawMessage(conf, hintUser, "nimin: projectPath = $1" % $conf.projectPath)
+    rawMessage(conf, hintUser, "nimin: backend = $1" % $conf.backend)
+    rawMessage(conf, hintUser, "nimin: selectedGC = $1" % $conf.selectedGC)
+    rawMessage(conf, hintUser, "nimin: optimizer = $1" % $conf.options)
 
   var graph = newModuleGraph(cache, conf)
   # `-d:drnim` activates the compiler's strongSemCheck call sites (the same
@@ -89,12 +98,18 @@ proc run*(): int =
     initOrcDefines(conf)
 
   if conf.target.targetOS == osStandalone:
+    if verbose:
+      rawMessage(conf, hintUser, "nimin: standalone target detected, provisioning panicoverride")
     provisionPanicOverride(conf)
 
   # Lint type definitions before compilation. This must happen before
   # mainCommand because `strongSemCheck` does not fire for nkTypeSection
   # nodes — only routine bodies trigger it.
+  if verbose:
+    rawMessage(conf, hintUser, "nimin: running type-section linter")
   lintModuleTypes(conf, graph.cache)
 
+  if verbose:
+    rawMessage(conf, hintUser, "nimin: entering main compilation")
   mainCommand(graph)
   result = conf.errorCounter

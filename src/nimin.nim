@@ -35,6 +35,11 @@ nimin compiles with strict zero-baggage defaults: --mm:arc -d:useMalloc,
 --panics:on, --exceptions:quirky, -d:danger, --opt:size and aggressive
 C-compiler size flags. Explicit options on the command line override defaults.
 
+Options:
+  --verbose, -V    Show detailed build information (nimin + compiler internals)
+  --version, -v    Show version information
+  --help, -h       Show this help message
+
 For full options, run: nimin c --fullhelp
 """
 
@@ -58,13 +63,25 @@ proc main(): int =
   else:
     discard
 
+  # Detect --verbose / -V before passing to the compiler pipeline.
+  var verbose = false
+  for a in args:
+    if a == "--verbose" or a == "-V":
+      verbose = true
+      break
+
+  if verbose:
+    stderr.writeLine "nimin: verbose mode enabled"
+    stderr.writeLine "nimin: applying strict defaults: --mm:arc -d:useMalloc --panics:on --exceptions:quirky -d:danger --opt:size"
+    stderr.writeLine "nimin: running dialect linter"
+
   # Warn when compiling a plain .nim file under nimin rules.
   for a in args:
     if a.len > 0 and a[0] != '-' and not isNiminSource(a) and a.endsWith(".nim"):
       stderr.writeLine "hint: compiling .nim file under nimin strict defaults (use .nmi for the nimin dialect)"
       break
 
-  result = run()
+  result = run(verbose)
 
 when isMainModule:
   quit main()

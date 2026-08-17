@@ -41,6 +41,12 @@ proc niminCmdLine*(userArgs: openArray[string]): string =
   ## Build the full command line: nimin strict defaults first, then the
   ## user's arguments. Later switches override earlier ones, so the user
   ## can always override defaults explicitly.
+  ## Nimin-only flags (--verbose, -V) are stripped before reaching the compiler.
   result = strictSwitches().join(" ")
   if userArgs.len > 0:
-    result.add " " & userArgs.join(" ")
+    var filtered: seq[string]
+    for arg in userArgs:
+      if arg != "--verbose" and arg != "-V":
+        filtered.add arg
+    if filtered.len > 0:
+      result.add " " & filtered.join(" ")
