@@ -1,5 +1,5 @@
-import std/[os, parseopt, sequtils, strutils]
-import std/pathnorm
+import std/[os, parseopt, strutils]
+
 import compiler/commands
 import compiler/options
 import compiler/msgs
@@ -8,11 +8,12 @@ import compiler/main
 import compiler/idents
 import compiler/cmdlinehelper
 import compiler/modulegraphs
-import compiler/condsyms
+import compiler/ast
 import compiler/pathutils
 import compiler/platform
 
 import ./config
+import ./linter
 
 const
   NimRoot = getCurrentCompilerExe().parentDir.parentDir
@@ -61,6 +62,7 @@ proc processCmdLine(pass: TCmdLinePass, cmd: string; conf: ConfigRef) =
 proc run*(): int =
   ## Drive the Nim compilation pipeline with nimin's strict defaults.
   ## Returns the compiler error counter (0 = success).
+  resetLintState()
   let cache = newIdentCache()
   let conf = newConfigRef()
   let self = NimProg(
@@ -73,6 +75,12 @@ proc run*(): int =
   self.processCmdLineAndProjectPath(conf)
 
   var graph = newModuleGraph(cache, conf)
+  # `-d:drnim` activates the compiler's strongSemCheck call sites (the same
+  # extension point DrNim uses). It also guards those sites with a
+  # `compatibleProps` hook, which must be non-nil or the compiler crashes.
+  graph.compatibleProps = proc (graph: ModuleGraph; formal, actual: PType): bool {.nimcall.} =
+    true
+  graph.strongSemCheck = strongSemCheck
   if not self.loadConfigsAndProcessCmdLine(cache, conf, graph):
     return conf.errorCounter
 
@@ -82,6 +90,11 @@ proc run*(): int =
 
   if conf.target.targetOS == osStandalone:
     provisionPanicOverride(conf)
+
+  # Lint type definitions before compilation. This must happen before
+  # mainCommand because `strongSemCheck` does not fire for nkTypeSection
+  # nodes — only routine bodies trigger it.
+  lintModuleTypes(conf, graph.cache)
 
   mainCommand(graph)
   result = conf.errorCounter
