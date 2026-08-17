@@ -69,6 +69,9 @@ nimin is in active development toward v0.1.0. Current working features:
 # Compile a Nim file with nimin
 nimin c hello.nim
 
+# Show detailed build diagnostics
+nimin c --verbose hello.nim
+
 # Compare binary sizes
 ls -la hello  # nimin-compiled
 nim c -d:release hello.nim  # standard Nim
