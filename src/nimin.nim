@@ -7,8 +7,20 @@ const
   YearStarted = 2026
   BuildYear {.intdefine.} = 2026
   Tagline = "Zero-baggage Nim dialect for tiny binaries on constrained runtimes."
-  Copyright = "(c) " & $YearStarted & "-" & $BuildYear &
-    " the nimin project authors and contributors. Distributed under the MIT license."
+
+func copyright(): string =
+  let year = if YearStarted == BuildYear: $YearStarted
+             else: $YearStarted & "-" & $BuildYear
+  var utf8 = false
+  for key in ["LC_ALL", "LC_CTYPE", "LANG"]:
+    let val = getEnv(key).toLowerAscii
+    if val.contains("utf-8") or val.contains("utf8"):
+      utf8 = true
+      break
+  let symbol = if utf8: "\u00A9" else: "(c)"
+  symbol & " " & year & " the Nimin project authors and contributors. Distributed under the MIT license."
+
+const
   Usage = """
 nimin — the symmetrical, zero-baggage dialect of Nim for tiny binaries and
 constrained runtimes.
@@ -38,7 +50,7 @@ proc main(): int =
   of "--version", "-v":
     stdout.writeLine "nimin " & Version
     stdout.writeLine Tagline
-    stdout.writeLine Copyright
+    stdout.writeLine copyright()
     return 0
   of "--help", "-h", "help":
     stdout.write Usage
