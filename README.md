@@ -146,8 +146,12 @@ nimin believes in:
 
 ## License
 
-MIT
+[MIT](LICENSE)
 
 ## Contributing
 
 See the project repository for architecture decisions, development guidelines, and implementation details.
+
+---
+
+Built with care for constrained runtimes. If nimin saves you bytes, that's the whole point.
