@@ -132,4 +132,4 @@ MIT
 
 ## Contributing
 
-See the `.development/` directory for project documentation, architecture decisions, and development guidelines.
+See the project repository for architecture decisions, development guidelines, and implementation details.
