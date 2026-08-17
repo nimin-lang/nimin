@@ -46,6 +46,12 @@ nimin is a compilation dialect that transforms standard Nim code into minimal, p
 - **Enforced coding patterns** - rejects dynamic exceptions, macros, and unchecked polymorphic inheritance
 - **Predictable behavior** - no hidden runtime costs or surprises
 
+### Micro-stdlib
+- **Zero-heap Span[T]** - non-owning views with slice, search, and iteration
+- **Zero-heap I/O** - raw POSIX write with no libc buffering, no allocation
+- **Zero-heap CLI parser** - stateful argc/argv scanning with pure pointer arithmetic
+- **Caller-allocates** - all buffers provided by the caller, never malloc internally
+
 ## Current Status
 
 nimin is in active development toward v0.1.0. Current working features:
@@ -54,7 +60,7 @@ nimin is in active development toward v0.1.0. Current working features:
 - ✅ Benchmark harness showing significant size reductions
 - ✅ Panic override for standalone builds
 - ✅ Dialect linter — rejects exceptions, macros, unchecked inheritance
-- 🔄 Micro-stdlib modules (in progress: span, io, cli)
+- ✅ Micro-stdlib modules: `nimin/span`, `nimin/io`, `nimin/cli`
 - 🔄 Packaging for nimble install (planned)
 
 ## Quick Start
@@ -76,6 +82,40 @@ ls -la hello  # standard-compiled
 | hello   | 77 KB        | 17.6 KB | 77%     |
 | cli     | 76 KB        | 17.9 KB | 76%     |
 | json    | 144 KB       | 46 KB   | 68%     |
+
+## Micro-stdlib Usage
+
+nimin provides zero-heap alternative modules for common tasks:
+
+```nim
+# nimin/span — non-owning views, no allocation
+import nimin/span
+
+let text = "hello world"
+let view = toSpan(text)
+let sub = view.subspan(6, 5)  # "world"
+echo sub  # prints "world"
+
+# nimin/io — zero-heap I/O, raw POSIX write
+import nimin/io
+
+print("hello\n")          # raw write, no buffering
+printInt(42)               # integer format + newline
+printErr("error\n")        # stderr
+
+# nimin/cli — zero-heap argument parsing
+import nimin/cli
+
+var p = initCli(["--verbose", "input.txt", "-o", "output.txt"])
+while p.hasMore():
+  if p.hasFlag():
+    let f = p.nextFlag()
+    let name = f.flagName()
+    # parse flag name...
+  else:
+    let arg = p.nextArg()
+    # process positional...
+```
 
 ## Philosophy
 
