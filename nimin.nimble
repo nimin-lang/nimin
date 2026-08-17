@@ -1,7 +1,7 @@
 # Package
 
 version       = "0.1.0"
-author        = "nimin contributors"
+author        = "Antonio Ognio"
 description   = "The symmetrical, zero-baggage dialect of Nim for tiny binaries and constrained runtimes."
 license       = "MIT"
 

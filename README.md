@@ -61,7 +61,7 @@ nimin is in active development toward v0.1.0. Current working features:
 - ✅ Panic override for standalone builds
 - ✅ Dialect linter — rejects exceptions, macros, unchecked inheritance
 - ✅ Micro-stdlib modules: `nimin/span`, `nimin/io`, `nimin/cli`
-- 🔄 Packaging for nimble install (planned)
+- ✅ Packaging for nimble install
 
 ## Quick Start
 
