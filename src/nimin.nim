@@ -4,6 +4,7 @@ import niminpkg/driver
 
 const
   Version = "0.1.0"
+  Tagline = "Zero-baggage Nim dialect for tiny binaries on constrained runtimes."
   Usage = """
 nimin — the symmetrical, zero-baggage dialect of Nim for tiny binaries and
 constrained runtimes.
@@ -32,6 +33,7 @@ proc main(): int =
   case args[0]
   of "--version", "-v":
     stdout.writeLine "nimin " & Version
+    stdout.writeLine Tagline
     return 0
   of "--help", "-h", "help":
     stdout.write Usage
