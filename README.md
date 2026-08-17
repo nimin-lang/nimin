@@ -75,6 +75,24 @@ nim c -d:release hello.nim  # standard Nim
 ls -la hello  # standard-compiled
 ```
 
+## Architecture
+
+```
+nimin/
+  src/nimin.nim          # CLI binary — drives Nim compiler as a library
+  src/niminpkg/          # Internal: config, driver, linter, panic override
+  lib/nimin/             # Micro-stdlib — user-importable modules
+    span.nim             #   Span[T]: non-owning, zero-heap views
+    io.nim               #   Zero-heap console I/O via raw POSIX
+    cli.nim              #   Zero-heap argc/argv parser
+```
+
+**`src/`** builds the `nimin` executable. It imports Nim compiler modules to drive the compilation pipeline, inject strict defaults, run the linter, and produce a C file that GCC/Clang compiles into a tiny binary.
+
+**`lib/`** is what nimin-compiled programs import (`import nimin/span`). It ships with the package via nimble's `installDirs`. The modules follow the dialect's core constraint: caller-allocates buffers, never malloc internally.
+
+**Why one repo:** the stdlib is tightly coupled to nimin's constraints — heap-free, POSIX-only, panic-only error model. Linter or driver changes may require coordinated stdlib updates. The codebase is small enough that separate repos add coordination overhead without benefit. If the stdlib becomes useful outside nimin, it can be split out then.
+
 ## Benchmark Results
 
 | Program | Standard Nim | nimin | Reduction |
