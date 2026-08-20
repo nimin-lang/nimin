@@ -69,7 +69,7 @@ nimin is in active development toward v0.1.0. Current working features:
 
 ## Limitations
 
-nimin achieves its size and predictability goals by **removing Nim runtime features**. These are not bugs — they are the point of the dialect. Be aware before you start to port Nim programs or attempt something beyond current dialect capabilities:
+Nimin achieves its size and predictability goals by **removing Nim runtime features**. These are not bugs — they are the point of the dialect. Be aware before you start to port Nim programs or attempt something beyond current dialect capabilities:
 
 ### Language Features Removed
 - **No dynamic exceptions** — `try/except/finally` and `raise` are rejected by the linter. Use `Result[T, E]` or `panic`.
@@ -220,7 +220,7 @@ nimin is early in its lifecycle. The following are planned for the 0.x series:
 
 ## Philosophy
 
-nimin believes in:
+Nimin believes in:
 - **Zero baggage** - include only what you need
 - **Predictable behavior** - no hidden runtime costs
 - **Explicit error handling** - no silent failures
