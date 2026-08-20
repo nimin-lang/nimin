@@ -69,7 +69,7 @@ nimin is in active development toward v0.1.0. Current working features:
 
 ## Limitations
 
-nimin achieves its size and predictability goals by **removing Nim runtime features**. These are not bugs — they are the point of the dialect. Be aware before you start:
+nimin achieves its size and predictability goals by **removing Nim runtime features**. These are not bugs — they are the point of the dialect. Be aware before you start to port Nim programs or attempt something beyond current dialect capabilities:
 
 ### Language Features Removed
 - **No dynamic exceptions** — `try/except/finally` and `raise` are rejected by the linter. Use `Result[T, E]` or `panic`.
@@ -78,8 +78,9 @@ nimin achieves its size and predictability goals by **removing Nim runtime featu
 - **No garbage collector** — `--mm:arc -d:useMalloc` only. Reference cycles leak; break them manually or use weak references.
 - **No runtime bounds checks in release** — `-d:danger` strips `doAssert` checks. Your code must be correct.
 
-### Standard Library Not Available
-- **No `seq`, `Table`, `HashSet`, `Array`** — these allocate. Use `Span[T]` over fixed-size arrays or caller-allocated buffers.
+### Standard Library Largely Incompatible
+The Nim standard library is **present but most modules fail to compile** under nimin's strict defaults because they transitively depend on forbidden features:
+- **No `seq`, `Table`, `HashSet`** — these allocate on the GC heap. Use `Span[T]` over fixed-size arrays or caller-allocated buffers.
 - **No `unicode` module** — no UTF-8 iteration, rune navigation, or case folding. `nimin/span` operates on bytes only.
 - **No `streams`, `asyncdispatch`, `threads`** — no async, no thread pool, no channels.
 - **No `httpclient`, `json` (partial), `strutils` (partial), `os` (partial)** — most stdlib modules transitively depend on GC, exceptions, or allocation.
@@ -199,6 +200,23 @@ while p.hasMore():
     let arg = p.nextArg()
     # process positional...
 ```
+
+## Testing
+
+Tests are run with **standard Nim** (`nim c -r`), not `nimin c`. The test *runner* uses `std/unittest` which requires macros and exceptions, but the *code under test* (nimin's driver, linter, micro-stdlib) is validated to compile under nimin's strict defaults.
+
+The integration test (`test_integration.nim`) shells out to the `nimin` binary to verify the full pipeline end-to-end.
+
+See `nimin.nimble` task `test` for the full test command list.
+
+## Likely Additions in Future 0.x Releases
+
+nimin is early in its lifecycle. The following are planned for the 0.x series:
+
+- **Compiler-assisted migration tool** — hook into the linter's diagnostic infrastructure to emit structured fix suggestions (AST rewrites: `seq[T]` → `Span[T]`, `try/except` → `Result[T, E]`, `macro` → templates/generics/`importc`). An LLM agent consumes these diagnostics to apply edits.
+- **Native test runner** (`nimin/test`) — zero-allocation framework using templates + `panic`, no macros/exceptions. Enables dogfooding: compile tests *with* nimin for standalone target verification.
+- **Package manager & registry** — nimin-native dependency resolver for packages that compile under strict defaults. Curated registry of compatible libraries.
+- **Growing stdlib parity** — incremental port of Nim stdlib modules adapted to nimin constraints: `nimin/str` (byte-span string ops), `nimin/fs` (POSIX file I/O), `nimin/utf8` (rune navigation), `nimin/htab` (fixed-capacity hash tables), `nimin/sort` (in-place sorts), `nimin/time` (no-alloc time parsing), etc.
 
 ## Philosophy
 
