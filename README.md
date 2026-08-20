@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/nimin-logo.svg" alt="nimin logo" width="66%">
+  <img src="assets/images/nimin-logo.png" alt="nimin logo" width="66%">
 </p>
 
 # nimin
