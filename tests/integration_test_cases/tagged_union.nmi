@@ -1,0 +1,27 @@
+# Test tagged unions (preferred over inheritance in nimin)
+
+type
+  ShapeKind* = enum
+    Circle, Rect
+
+  Shape* = object
+    case kind*: ShapeKind
+    of Circle:
+      radius*: float
+    of Rect:
+      width*, height*: float
+
+proc area(s: Shape): float =
+  case s.kind
+  of Circle:
+    3.14159 * s.radius * s.radius
+  of Rect:
+    s.width * s.height
+
+proc main() =
+  let c = Shape(kind: Circle, radius: 5.0)
+  let r = Shape(kind: Rect, width: 3.0, height: 4.0)
+  echo "Circle area: ", area(c)
+  echo "Rect area: ", area(r)
+
+main()

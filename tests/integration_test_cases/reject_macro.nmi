@@ -1,0 +1,2 @@
+macro badMacro(body: untyped): untyped =
+  result = body

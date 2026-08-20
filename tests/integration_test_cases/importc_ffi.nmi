@@ -1,0 +1,8 @@
+# Test importc for C FFI (allowed metaprogramming escape hatch)
+
+proc puts(s: cstring) {.importc: "puts", header: "<stdio.h>".}
+
+proc main() =
+  puts("Hello from C via importc!")
+
+main()

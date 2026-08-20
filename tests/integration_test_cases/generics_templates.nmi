@@ -1,0 +1,26 @@
+# Test generics and templates work under nimin
+
+type
+  Wrapper*[T] = object
+    value*: T
+
+proc wrap*[T](v: T): Wrapper[T] =
+  Wrapper[T](value: v)
+
+proc unwrap*[T](w: Wrapper[T]): T =
+  w.value
+
+template makePair*[A, B](a: A, b: B): tuple[x: A, y: B] =
+  (a, b)
+
+proc main() =
+  let w = wrap(42)
+  echo "wrapped int: ", unwrap(w)
+
+  let ws = wrap("hello")
+  echo "wrapped string: ", unwrap(ws)
+
+  let p = makePair(1, "two")
+  echo "pair: ", p.x, ", ", p.y
+
+main()

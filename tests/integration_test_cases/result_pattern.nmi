@@ -1,0 +1,34 @@
+type
+  Result*[T, E] = object
+    ok*: bool
+    value*: T
+    error*: E
+
+template ok*[T, E](r: var Result[T, E], val: T) =
+  r.ok = true
+  r.value = val
+
+template err*[T, E](r: var Result[T, E], e: E) =
+  r.ok = false
+  r.error = e
+
+proc divSafe(a, b: int): Result[int, string] =
+  if b == 0:
+    err(result, "division by zero")
+  else:
+    ok(result, a div b)
+
+proc main() =
+  let r1 = divSafe(10, 2)
+  if r1.ok:
+    echo "divSafe(10, 2) = ", r1.value
+  else:
+    echo "Error: ", r1.error
+
+  let r2 = divSafe(10, 0)
+  if r2.ok:
+    echo "divSafe(10, 0) = ", r2.value
+  else:
+    echo "Expected error: ", r2.error
+
+main()
